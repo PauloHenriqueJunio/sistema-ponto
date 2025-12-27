@@ -17,6 +17,10 @@ function App() {
   const [pontos, setPontos] = useState<Ponto[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
 
+  const [showModal, setShowModal] = useState(false);
+  const [newUserName, setNewUserName] = useState("");
+  const [newUserEmail, setNewUserEmail] = useState("");
+
   const fetchUsers = () => {
     fetch("http://localhost:3000/users")
       .then((res) => res.json())
@@ -60,6 +64,33 @@ function App() {
     }
   };
 
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3000/users", {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify({
+          name: newUserName,
+          email: newUserEmail,
+          password: "123",
+          role: "FUNCIONARIO",
+        }),
+      });
+      if (response.ok) {
+        alert("Funcionário criado com sucesso!");
+        setShowModal(false);
+        setNewUserName("");
+        setNewUserEmail("");
+        fetchUsers();
+      } else {
+        alert("Erro ao criar (Verifique se o email já existe)");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const getBadgeColor = (type: string) => {
     switch (type) {
       case "ENTRADA":
@@ -74,9 +105,15 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-300 py-10 px-4">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-slate-800 p-6 text-white text-center">
+        <div className="bg-slate-800 p-6 text-white text-center justify-between items-center">
           <h1 className="text-3xl font-bold">Ponto Eletrônico</h1>
           <p className="text-slate-400 mt-2">Sistema de Gestão de Jornada</p>
+          <button
+            onClick={() => setShowModal(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition shadow-lg"
+          >
+            + Novo Funcionário
+          </button>
         </div>
 
         <div className="p-8">
@@ -175,6 +212,65 @@ function App() {
           )}
         </div>
       </div>
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm z-50">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">
+                Novo funcionário
+              </h2>
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="text-gray-400 -mt-10 -mr-2 hover:text-gray-600 hover:bg-opacity-100 text-2xl font-light transition"
+              >
+                x
+              </button>
+            </div>
+            <form onSubmit={handleCreateUser}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nome
+                </label>
+                <input
+                  type="text"
+                  required
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={newUserName}
+                  onChange={(e) => setNewUserName(e.target.value)}
+                />
+              </div>
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  required
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={newUserEmail}
+                  onChange={(e) => setNewUserEmail(e.target.value)}
+                />
+              </div>
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
+                >
+                  Salvar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 interface User {
   id: number;
@@ -40,55 +41,56 @@ function App() {
 
   const handleBaterPonto = async (tipo: string) => {
     if (!selectedUserId) {
-      alert("Selecione um funcionário primeiro!");
+      toast.error("Selecione um funcionário primeiro!");
       return;
     }
 
-    try {
-      const response = await fetch("http://localhost:3000/pontos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: selectedUserId,
-          type: tipo,
-        }),
-      });
+    const promise = fetch("http://localhost:3000/pontos", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: selectedUserId,
+        type: tipo,
+      }),
+    }).then((response) => {
+      if (!response.ok) throw new Error("Erro ao registrar ponto");
+      fetchPontos();
+      return response;
+    });
 
-      if (response.ok) {
-        fetchPontos();
-      } else {
-        alert("Erro ao registrar ponto");
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    toast.promise(promise, {
+      loading: "Registrando ponto...",
+      success: "Ponto registrado com sucesso!",
+      error: "Erro ao registrar ponto",
+    });
   };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:3000/users", {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify({
-          name: newUserName,
-          email: newUserEmail,
-          password: "123",
-          role: "FUNCIONARIO",
-        }),
-      });
-      if (response.ok) {
-        alert("Funcionário criado com sucesso!");
-        setShowModal(false);
-        setNewUserName("");
-        setNewUserEmail("");
-        fetchUsers();
-      } else {
-        alert("Erro ao criar (Verifique se o email já existe)");
-      }
-    } catch (error) {
-      console.error(error);
-    }
+
+    const promise = fetch("http://localhost:3000/users", {
+      method: "POST",
+      headers: { "Content-type": "application/json" },
+      body: JSON.stringify({
+        name: newUserName,
+        email: newUserEmail,
+        password: "123",
+        role: "FUNCIONARIO",
+      }),
+    }).then((response) => {
+      if (!response.ok) throw new Error("Email já existe ou dados inválidos");
+      setShowModal(false);
+      setNewUserName("");
+      setNewUserEmail("");
+      fetchUsers();
+      return response;
+    });
+
+    toast.promise(promise, {
+      loading: "Criando funcionário...",
+      success: "Funcionário criado com sucesso!",
+      error: (err) => `Erro: ${err.message}`,
+    });
   };
 
   const getBadgeColor = (type: string) => {
@@ -104,15 +106,16 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-300 py-10 px-4">
+      <Toaster position="top-right" reverseOrder={true} />
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-slate-800 p-6 text-white text-center justify-between items-center">
           <h1 className="text-3xl font-bold">Ponto Eletrônico</h1>
           <p className="text-slate-400 mt-2">Sistema de Gestão de Jornada</p>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold transition shadow-lg"
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1 mt-2 rounded-lg text-sm font-bold transition shadow-lg"
           >
-            + Novo Funcionário
+            Novo Funcionário
           </button>
         </div>
 
@@ -271,6 +274,7 @@ function App() {
           </div>
         </div>
       )}
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 }

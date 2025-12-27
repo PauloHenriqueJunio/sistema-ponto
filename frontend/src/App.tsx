@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import Swal from "sweetalert2";
 
 interface User {
   id: number;
@@ -91,6 +92,41 @@ function App() {
       success: "Funcionário criado com sucesso!",
       error: (err) => `Erro: ${err.message}`,
     });
+  };
+
+  const handleDeletePonto = async (id: number) => {
+    const result = await Swal.fire({
+      title: 'Tem certeza?',
+      text: "Você não poderá reverter isso!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Deletar',
+      cancelButtonText: 'Cancelar',
+      background: '#f8f9fa'
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const promise = fetch(`http://localhost:3000/pontos/${id}`, {
+        method: "DELETE",
+      }).then((res) => {
+        if (!res.ok) throw new Error("Erro ao excluir registro");
+        fetchPontos();
+        return res;
+      });
+
+      await toast.promise(promise, {
+        loading: "Excluindo...",
+        success: "Registro apagado!",
+        error: "Erro ao excluir registro",
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao excluir registro");
+    }
   };
 
   const getBadgeColor = (type: string) => {
@@ -208,6 +244,13 @@ function App() {
                         minute: "2-digit",
                       })}
                     </span>
+                    <button
+                      onClick={() => handleDeletePonto(ponto.id)}
+                      className="ml-2 text-gray-400 hover:text-red-600 transition p-1 rounded-full hover:bg-red-50 hover:underline"
+                      title="Excluir registro"
+                    >
+                      Excluir
+                    </button>
                   </div>
                 </div>
               ))}

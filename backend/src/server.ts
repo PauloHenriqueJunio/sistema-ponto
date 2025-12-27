@@ -77,6 +77,21 @@ app.get("/pontos", async (req, res) => {
   }
 });
 
+app.delete('/pontos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await prisma.ponto.delete({
+      where: { id: Number(id) },
+    });
+
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao excluir registro' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });

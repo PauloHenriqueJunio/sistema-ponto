@@ -22,6 +22,7 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [darkMode, setDarkMode] = useState(false);
 
   const fetchUsers = () => {
     fetch("http://localhost:3000/users")
@@ -187,190 +188,199 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-300 py-10 px-4">
-      <Toaster position="top-right" reverseOrder={true} />
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-slate-800 p-6 text-white text-center justify-between items-center">
-          <h1 className="text-3xl font-bold">Ponto Eletrônico</h1>
-          <p className="text-slate-400 mt-2">Sistema de Gestão de Jornada</p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1 mt-2 rounded-lg text-sm font-bold transition shadow-lg"
-          >
-            Novo Funcionário
-          </button>
-        </div>
-
-        <div className="p-8">
-          <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Identifique-se:
-            </label>
-            <select
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-              value={selectedUserId}
-              onChange={(e) => setSelectedUserId(e.target.value)}
-            >
-              <option value="">-- Selecione seu nome --</option>
-              {users.map((user) => (
-                <option key={user.id} value={user.id}>
-                  {user.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-8">
+    <div className={darkMode ? "dark" : ""}>
+      <div className="min-h-screen bg-gray-100 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 font-sans">
+        <Toaster position="top-right" reverseOrder={true} />
+        <div className="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-slate-800 p-6 text-white text-center justify-between items-center relative">
+            <h1 className="text-3xl font-bold">Ponto Eletrônico</h1>
+            <p className="text-slate-400 mt-2">Sistema de Gestão de Jornada</p>
             <button
-              onClick={() => handleBaterPonto("ENTRADA")}
-              className="col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow transition transform hover:-translate-y-1"
+              onClick={() => setShowModal(true)}
+              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1 mt-2 mr-2 rounded-lg text-sm font-bold transition shadow-lg"
             >
-              Iniciar Jornada
+              Novo Funcionário
             </button>
-
             <button
-              onClick={() => handleBaterPonto("SAIDA_ALMOCO")}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition opacity-90 hover:opacity-100"
+              onClick={() => setDarkMode(!darkMode)}
+              className="absolute top-4 right-4 bg-slate-700 hover:bg-slate-600 text-yellow-300 px-1 py-1.5 rounded-lg text-lg leading-none transition shadow-lg"
+              title="Alterar tema"
             >
-              Ida Almoço
-            </button>
-
-            <button
-              onClick={() => handleBaterPonto("VOLTA_ALMOCO")}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition opacity-90 hover:opacity-100"
-            >
-              Volta Almoço
-            </button>
-
-            <button
-              onClick={() => handleBaterPonto("SAIDA")}
-              className="col-span-2 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg shadow transition transform hover:-translate-y-1"
-            >
-              Encerrar Dia
+              {darkMode ? "☀️" : "🌙"}
             </button>
           </div>
 
-          <hr className="my-6 border-gray-200" />
-
-          <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            Últimos Registros
-          </h3>
-
-          {pontos.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">
-              Nenhum registro hoje.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {pontos.map((ponto) => (
-                <div
-                  key={ponto.id}
-                  className="flex justify-between items-center p-4 bg-gray-50 border border-gray-100 rounded-lg hover:bg-blue-50 transition"
-                >
-                  <div className="flex flex-col">
-                    <span className="font-bold text-gray-700">
-                      {ponto.user?.name}
-                    </span>
-                    <span className="text-xs text-gray-400">
-                      ID: #{ponto.id}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold border ${getBadgeColor(
-                        ponto.type
-                      )}`}
-                    >
-                      {ponto.type.replace("_", " ")}
-                    </span>
-                    <span className="text-gray-600 font-mono font-medium">
-                      {new Date(ponto.timestamp).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                    <button
-                    onClick={() => handleEditPonto(ponto)}
-                    className="ml-4 text-gray-400 hover:text-blue-600 transition p-1 rounded-full hover:underline"
-                    title="Corrigir registro"
-                    >
-                      Editar
-                    </button>
-                    <button
-                      onClick={() => handleDeletePonto(ponto.id)}
-                      className="ml-2 text-gray-400 hover:text-red-600 transition p-1 rounded-full  hover:underline"
-                      title="Excluir registro"
-                    >
-                      Excluir
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm z-50">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">
-                Novo funcionário
-              </h2>
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 -mt-10 -mr-2 hover:text-gray-600 hover:bg-opacity-100 text-2xl font-light transition"
+          <div className="p-8">
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Identifique-se:
+              </label>
+              <select
+                className="w-full p-3 border border-gray-300 bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                value={selectedUserId}
+                onChange={(e) => setSelectedUserId(e.target.value)}
               >
-                x
+                <option value="">-- Selecione seu nome --</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <button
+                onClick={() => handleBaterPonto("ENTRADA")}
+                className="col-span-2 bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg shadow transition transform hover:-translate-y-1"
+              >
+                Iniciar Jornada
+              </button>
+
+              <button
+                onClick={() => handleBaterPonto("SAIDA_ALMOCO")}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition opacity-90 hover:opacity-100"
+              >
+                Ida Almoço
+              </button>
+
+              <button
+                onClick={() => handleBaterPonto("VOLTA_ALMOCO")}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg shadow transition opacity-90 hover:opacity-100"
+              >
+                Volta Almoço
+              </button>
+
+              <button
+                onClick={() => handleBaterPonto("SAIDA")}
+                className="col-span-2 bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-lg shadow transition transform hover:-translate-y-1"
+              >
+                Encerrar Dia
               </button>
             </div>
-            <form onSubmit={handleCreateUser}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome
-                </label>
-                <input
-                  type="text"
-                  required
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  value={newUserName}
-                  onChange={(e) => setNewUserName(e.target.value)}
-                />
+
+            <hr className="my-6 border-gray-200" />
+
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+              Últimos Registros
+            </h3>
+
+            {pontos.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">
+                Nenhum registro hoje.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {pontos.map((ponto) => (
+                  <div
+                    key={ponto.id}
+                    className="flex justify-between items-center p-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 rounded-lg hover:bg-blue-50 transition"
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-bold text-gray-700 dark:text-white">
+                        {ponto.user?.name}
+                      </span>
+                      <span className="text-xs text-gray-400 dark:text-gray-300">
+                        ID: #{ponto.id}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-bold border ${getBadgeColor(
+                          ponto.type
+                        )}`}
+                      >
+                        {ponto.type.replace("_", " ")}
+                      </span>
+                      <span className="text-gray-600 dark:text-gray-300 font-mono font-medium">
+                        {new Date(ponto.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      <button
+                        onClick={() => handleEditPonto(ponto)}
+                        className="ml-4 text-gray-400 dark:text-gray-300 hover:text-blue-600 transition p-1 rounded-full hover:underline"
+                        title="Corrigir registro"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDeletePonto(ponto.id)}
+                        className="ml-2 text-gray-400 dark:text-gray-300 hover:text-red-600 transition p-1 rounded-full  hover:underline"
+                        title="Excluir registro"
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  required
-                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  value={newUserEmail}
-                  onChange={(e) => setNewUserEmail(e.target.value)}
-                />
-              </div>
-              <div className="flex justify-end gap-3">
+            )}
+          </div>
+        </div>
+        {showModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm z-50">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-bold text-gray-800">
+                  Novo funcionário
+                </h2>
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                  className="text-gray-400 -mt-10 -mr-2 hover:text-gray-600 hover:bg-opacity-100 text-2xl font-light transition"
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
-                >
-                  Salvar
+                  x
                 </button>
               </div>
-            </form>
+              <form onSubmit={handleCreateUser}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Nome
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    className="w-full p-2 border bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={newUserName}
+                    onChange={(e) => setNewUserName(e.target.value)}
+                  />
+                </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    className="w-full p-2 border bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={newUserEmail}
+                    onChange={(e) => setNewUserEmail(e.target.value)}
+                  />
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Salvar
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
-      <Toaster position="top-right" reverseOrder={false} />
+        )}
+        <Toaster position="top-right" reverseOrder={false} />
+      </div>
     </div>
   );
 }

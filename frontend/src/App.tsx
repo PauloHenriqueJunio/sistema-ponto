@@ -287,9 +287,21 @@ function App() {
               />
 
               {pontosFiltrados.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">
-                  Nenhum registro hoje.
-                </p>
+                <div className="text-center py-10 opacity-70">
+                  <p className="text-gray-500 dark:text-gray-300 font-medium">
+                    {busca
+                      ? `Nenhum registro encontrado para "${busca}".`
+                      : "Nenhum registro de ponto encontrado"}
+                  </p>
+                  {busca && (
+                    <button
+                      onClick={() => setBusca("")}
+                      className="text-blue-500 hover:underline text-sm font-semibold mt-2"
+                    >
+                      Limpar busca
+                    </button>
+                  )}
+                </div>
               ) : (
                 <div className="space-y-3">
                   {pontosFiltrados.map((ponto) => (

@@ -420,6 +420,23 @@ function App() {
           <Toaster position="top-right" reverseOrder={false} />
         </div>
       </div>
+
+      <footer className="py-6 text-center shadow-lg dark:bg-slate-800">
+        <p className="text-gray-500 dark:text-gray-400 text-sm">
+          Desenvolvido por {``}
+          <a
+            href="https://github.com/PauloHenriqueJunio"
+            rel="noopener noreferrer"
+            target="_blank"
+            className="font-bold text-blue-600 hover:text-blue-500 hover:underline transition"
+          >
+            Paulo Henrique
+          </a>
+        </p>
+        <p className="text-xs text-gray-400 mt-1">
+          @ {new Date().getFullYear()} Sistema Ponto • v1.0
+        </p>
+      </footer>
     </div>
   );
 }

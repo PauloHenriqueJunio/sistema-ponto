@@ -23,6 +23,7 @@ function App() {
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [darkMode, setDarkMode] = useState(false);
+  const [busca, setBusca] = useState("");
 
   const fetchUsers = () => {
     fetch("http://localhost:3000/users")
@@ -187,6 +188,12 @@ function App() {
     }
   };
 
+  const pontosFiltrados = pontos.filter(
+    (ponto) =>
+      ponto.user?.name.toLowerCase().includes(busca.toLowerCase()) ||
+      ponto.type.toLowerCase().includes(busca.toLowerCase())
+  );
+
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gray-100 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 font-sans">
@@ -259,132 +266,147 @@ function App() {
               </button>
             </div>
 
-            <hr className="my-6 border-gray-200" />
+            <hr className="my-6 border-gray-200 dark:border-slate-700" />
 
-            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4"></div>
+
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2 flex items-center gap-2">
               Últimos Registros
+              <span className="text-sm font-normal text-gray-500 bg-gray-100 dark:bg-slate-700 dark:text-gray-400 px-2 py-0.5 mt-1 rounded-full">
+                {pontosFiltrados.length}
+              </span>
             </h3>
 
-            {pontos.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">
-                Nenhum registro hoje.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {pontos.map((ponto) => (
-                  <div
-                    key={ponto.id}
-                    className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 rounded-lg hover:bg-blue-50 transition gap-3"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-bold text-gray-700 dark:text-white text-lg sm:text-base">
-                        {ponto.user?.name}
-                      </span>
-                      <span className="text-xs text-gray-400 dark:text-gray-300">
-                        ID: #{ponto.id}
-                      </span>
-                    </div>
+            <div className="w-full sm:w-auto">
+              <input
+                type="text"
+                placeholder="Buscar por nome ou tipo"
+                className=" mb-4 w-full sm:w-64 p-2 border border-gray-300 dark:border-slate-600 rounded-lg dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+              />
 
-                    <div className="flex flex-wrap items-center justify-between sm:justify-end w-full sm:w-auto gap-3">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-2 py-1 rounded-md text-xs font-bold border ${getBadgeColor(
-                            ponto.type
-                          )}`}
-                        >
-                          {ponto.type.replace("_", " ")}
+              {pontosFiltrados.length === 0 ? (
+                <p className="text-gray-500 text-center py-4">
+                  Nenhum registro hoje.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {pontosFiltrados.map((ponto) => (
+                    <div
+                      key={ponto.id}
+                      className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 rounded-lg hover:bg-blue-50 transition gap-3"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-bold text-gray-700 dark:text-white text-lg sm:text-base">
+                          {ponto.user?.name}
                         </span>
-                        <span className="text-gray-600 dark:text-gray-300 font-mono font-medium text-sm">
-                          {new Date(ponto.timestamp).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                        <span className="text-xs text-gray-400 dark:text-gray-300">
+                          ID: #{ponto.id}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleEditPonto(ponto)}
-                          className="text-gray-400 dark:text-gray-300 hover:text-blue-600 transition text-sm font-medium hover:underline"
-                          title="Corrigir registro"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => handleDeletePonto(ponto.id)}
-                          className="text-gray-400 dark:text-gray-300 hover:text-red-600 transition text-sm font-medium hover:underline"
-                          title="Excluir registro"
-                        >
-                          Excluir
-                        </button>
+                      <div className="flex flex-wrap items-center justify-between sm:justify-end w-full sm:w-auto gap-3">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-600 dark:text-gray-300 font-mono font-medium text-sm">
+                            {new Date(ponto.timestamp).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                          <span
+                            className={`px-2 py-1 rounded-md text-xs font-bold border ${getBadgeColor(
+                              ponto.type
+                            )}`}
+                          >
+                            {ponto.type.replace("_", " ")}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleEditPonto(ponto)}
+                            className="text-gray-400 dark:text-gray-300 hover:text-blue-600 transition text-sm font-medium hover:underline"
+                            title="Corrigir registro"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => handleDeletePonto(ponto.id)}
+                            className="text-gray-400 dark:text-gray-300 hover:text-red-600 transition text-sm font-medium hover:underline"
+                            title="Excluir registro"
+                          >
+                            Excluir
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-        {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm z-50">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">
-                  Novo funcionário
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="text-gray-400 -mt-10 -mr-2 hover:text-gray-600 hover:bg-opacity-100 text-2xl font-light transition"
-                >
-                  x
-                </button>
-              </div>
-              <form onSubmit={handleCreateUser}>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Nome
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full p-2 border bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={newUserName}
-                    onChange={(e) => setNewUserName(e.target.value)}
-                  />
-                </div>
-                <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    required
-                    className="w-full p-2 border bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={newUserEmail}
-                    onChange={(e) => setNewUserEmail(e.target.value)}
-                  />
-                </div>
-                <div className="flex justify-end gap-3">
+          {showModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 backdrop-blur-sm z-50">
+              <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-gray-800 dark:text-gray-300">
+                    Novo funcionário
+                  </h2>
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition"
+                    className="text-gray-400 -mt-10 -mr-2 hover:text-gray-600 hover:bg-opacity-100 text-2xl font-light transition"
                   >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
-                  >
-                    Salvar
+                    x
                   </button>
                 </div>
-              </form>
+                <form onSubmit={handleCreateUser}>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Nome
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      className="w-full p-2 border bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      value={newUserName}
+                      onChange={(e) => setNewUserName(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      className="w-full p-2 border bg-white dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                      value={newUserEmail}
+                      onChange={(e) => setNewUserEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
+                    >
+                      Salvar
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
-        )}
-        <Toaster position="top-right" reverseOrder={false} />
+          )}
+          <Toaster position="top-right" reverseOrder={false} />
+        </div>
       </div>
     </div>
   );

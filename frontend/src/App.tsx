@@ -96,15 +96,15 @@ function App() {
 
   const handleDeletePonto = async (id: number) => {
     const result = await Swal.fire({
-      title: 'Tem certeza?',
-      text: "Você não poderá reverter isso!",
-      icon: 'warning',
+      title: "Tem certeza?",
+      text: "Você não poderá reverter isso",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Deletar',
-      cancelButtonText: 'Cancelar',
-      background: '#f8f9fa'
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Deletar",
+      cancelButtonText: "Cancelar",
+      background: "#f8f9fa",
     });
 
     if (!result.isConfirmed) return;
@@ -126,6 +126,52 @@ function App() {
     } catch (error) {
       console.error(error);
       toast.error("Erro ao excluir registro");
+    }
+  };
+
+  const handleEditPonto = async (ponto: Ponto) => {
+    const { value: novoTipo } = await Swal.fire({
+      title: "Corrigir registro",
+      text: `Mudar de ${ponto.type.replace("_", " ")} para:`,
+      icon: "question",
+      input: "select",
+      inputOptions: {
+        ENTRADA: "Entrada",
+        SAIDA_ALMOCO: "Ida Almoço",
+        VOLTA_ALMOCO: "Volta Almoço",
+        SAIDA: "Saída",
+      },
+      inputValue: ponto.type,
+      showCancelButton: true,
+      confirmButtonText: "Salvar Correção",
+      confirmButtonColor: "#3085d6",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (novoTipo) {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/pontos/${ponto.id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: novoTipo }),
+          }
+        );
+
+        if (response.ok) {
+          Swal.fire(
+            "Atualizado!",
+            "O tipo do registro foi corrigido.",
+            "success"
+          );
+          fetchPontos();
+        } else {
+          toast.error("Erro ao atualizar");
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -245,8 +291,15 @@ function App() {
                       })}
                     </span>
                     <button
+                    onClick={() => handleEditPonto(ponto)}
+                    className="ml-4 text-gray-400 hover:text-blue-600 transition p-1 rounded-full hover:underline"
+                    title="Corrigir registro"
+                    >
+                      Editar
+                    </button>
+                    <button
                       onClick={() => handleDeletePonto(ponto.id)}
-                      className="ml-2 text-gray-400 hover:text-red-600 transition p-1 rounded-full hover:bg-red-50 hover:underline"
+                      className="ml-2 text-gray-400 hover:text-red-600 transition p-1 rounded-full  hover:underline"
                       title="Excluir registro"
                     >
                       Excluir

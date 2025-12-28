@@ -77,7 +77,7 @@ app.get("/pontos", async (req, res) => {
   }
 });
 
-app.delete('/pontos/:id', async (req, res) => {
+app.delete("/pontos/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -88,7 +88,24 @@ app.delete('/pontos/:id', async (req, res) => {
     res.status(204).send();
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Erro ao excluir registro' });
+    res.status(500).json({ error: "Erro ao excluir registro" });
+  }
+});
+
+app.put("/pontos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { type } = req.body;
+
+    const ponto = await prisma.ponto.update({
+      where: { id: Number(id) },
+      data: { type },
+    });
+
+    res.json(ponto);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao atualizar registro" });
   }
 });
 

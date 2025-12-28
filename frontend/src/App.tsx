@@ -274,10 +274,10 @@ function App() {
                 {pontos.map((ponto) => (
                   <div
                     key={ponto.id}
-                    className="flex justify-between items-center p-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 rounded-lg hover:bg-blue-50 transition"
+                    className="flex flex-col sm:flex-row justify-between sm:items-center p-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 rounded-lg hover:bg-blue-50 transition gap-3"
                   >
                     <div className="flex flex-col">
-                      <span className="font-bold text-gray-700 dark:text-white">
+                      <span className="font-bold text-gray-700 dark:text-white text-lg sm:text-base">
                         {ponto.user?.name}
                       </span>
                       <span className="text-xs text-gray-400 dark:text-gray-300">
@@ -285,34 +285,39 @@ function App() {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-bold border ${getBadgeColor(
-                          ponto.type
-                        )}`}
-                      >
-                        {ponto.type.replace("_", " ")}
-                      </span>
-                      <span className="text-gray-600 dark:text-gray-300 font-mono font-medium">
-                        {new Date(ponto.timestamp).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                      <button
-                        onClick={() => handleEditPonto(ponto)}
-                        className="ml-4 text-gray-400 dark:text-gray-300 hover:text-blue-600 transition p-1 rounded-full hover:underline"
-                        title="Corrigir registro"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDeletePonto(ponto.id)}
-                        className="ml-2 text-gray-400 dark:text-gray-300 hover:text-red-600 transition p-1 rounded-full  hover:underline"
-                        title="Excluir registro"
-                      >
-                        Excluir
-                      </button>
+                    <div className="flex flex-wrap items-center justify-between sm:justify-end w-full sm:w-auto gap-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-2 py-1 rounded-md text-xs font-bold border ${getBadgeColor(
+                            ponto.type
+                          )}`}
+                        >
+                          {ponto.type.replace("_", " ")}
+                        </span>
+                        <span className="text-gray-600 dark:text-gray-300 font-mono font-medium text-sm">
+                          {new Date(ponto.timestamp).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleEditPonto(ponto)}
+                          className="text-gray-400 dark:text-gray-300 hover:text-blue-600 transition text-sm font-medium hover:underline"
+                          title="Corrigir registro"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDeletePonto(ponto.id)}
+                          className="text-gray-400 dark:text-gray-300 hover:text-red-600 transition text-sm font-medium hover:underline"
+                          title="Excluir registro"
+                        >
+                          Excluir
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}

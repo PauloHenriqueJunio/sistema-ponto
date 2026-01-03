@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface User {
   id: number;

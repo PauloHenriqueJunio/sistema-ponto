@@ -109,6 +109,44 @@ app.put("/pontos/:id", async (req, res) => {
   }
 });
 
+app.get("/stats", async (req, res) => {
+  try {
+    const porTipo = await prisma.ponto.groupBy({
+      by: ["type"],
+      _count: { type: true },
+    });
+
+    const porUsuario = await prisma.user.findMany({
+      select: {
+        name: true,
+        _count: {
+          select: { pontos: true },
+        },
+      },
+    });
+    const totalRegistro = await prisma.ponto.count();
+    const totalUsuarios = await prisma.user.count();
+
+    res.json({
+      pizza: porTipo.map((item) => ({
+        name: item.type,
+        value: item._count.type,
+      })),
+      barras: porUsuario.map((user) => ({
+        nome: user.name,
+        registros: user._count.pontos,
+      })),
+      resumo: {
+        totalRegistro,
+        totalUsuarios,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro ao buscar estatísticas" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });

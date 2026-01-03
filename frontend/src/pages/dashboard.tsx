@@ -25,6 +25,7 @@ interface DashboardData {
 
 function Dashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [isDark, setIsDark] = useState(false);
 
   useEffect(() => {
     fetch("/api/stats")
@@ -35,6 +36,29 @@ function Dashboard() {
       );
   }, []);
   const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+
+  useEffect(() => {
+    const checkDark = () =>
+      document.documentElement.classList.contains("dark") ||
+      document.body.classList.contains("dark") ||
+      !!document.querySelector(".dark");
+
+    const updateTheme = () => setIsDark(checkDark());
+
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+      subtree: true,
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const textColor = isDark ? "#e5e7eb" : "#111827";
+  const bgColor = isDark ? "#1f2937" : "#ffffff";
 
   if (!data) {
     return (
@@ -93,13 +117,14 @@ function Dashboard() {
                 />
                 <YAxis stroke="#888888" fontSize={12} tickLine={false} />
                 <Tooltip
-                  cursor={{ fill: "transparent" }}
                   contentStyle={{
-                    backgroundColor: "#1f2937",
+                    backgroundColor: bgColor,
                     border: "none",
-                    color: "#fff",
+                    color: textColor,
                     borderRadius: "8px",
                   }}
+                  labelStyle={{ color: textColor }}
+                  itemStyle={{ color: textColor }}
                 />
                 <Bar
                   dataKey="registros"
@@ -135,13 +160,22 @@ function Dashboard() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1f2937",
+                    backgroundColor: bgColor,
                     border: "none",
-                    color: "#fff",
+                    color: textColor,
                     borderRadius: "8px",
                   }}
+                  labelStyle={{ color: textColor }}
+                  itemStyle={{ color: textColor }}
                 />
-                <Legend formatter={(value) => value.replace("_", " ")} />
+                <Legend
+                  wrapperStyle={{ color: textColor }}
+                  formatter={(value) => (
+                    <span style={{ color: textColor }}>
+                      {value.replace("_", " ")}
+                    </span>
+                  )}
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>

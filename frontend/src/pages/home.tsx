@@ -22,7 +22,7 @@ function Home() {
   const [showModal, setShowModal] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode] = useState(false);
   const [busca, setBusca] = useState("");
 
   const fetchUsers = () => {
@@ -207,13 +207,6 @@ function Home() {
               className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1 mt-2 mr-2 rounded-lg text-sm font-bold transition shadow-lg"
             >
               Novo Funcionário
-            </button>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="absolute top-4 right-4 bg-slate-700 hover:bg-slate-600 text-yellow-300 px-1 py-1.5 rounded-lg text-lg leading-none transition shadow-lg"
-              title="Alterar tema"
-            >
-              {darkMode ? "☀️" : "🌙"}
             </button>
           </div>
 

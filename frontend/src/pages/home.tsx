@@ -196,20 +196,28 @@ function Home() {
       ponto.type.toLowerCase().includes(busca.toLowerCase())
   );
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
+    const response = await fetch("http://localhost:3000/pontos?limit=100");
+    const pontosPDF = await response.json();
     const doc = new jsPDF();
     doc.setFontSize(18);
     doc.text("Relatório de Ponto Eletrônico", 14, 22);
 
     doc.setFontSize(10);
-    doc.text(`Relatório gerado em ${new Date().toLocaleDateString()} ás ${new Date().toLocaleTimeString()}`, 14, 30);
-    doc.text("Desenvolvido por Paulo Henrique", 14, 35);
+    doc.text(
+      `Relatório gerado em ${new Date().toLocaleDateString()} ás ${new Date().toLocaleTimeString()}`,
+      14,
+      30
+    );
 
-    const dadosDaTabela = pontosFiltrados.map((ponto ) => [
+    const dadosDaTabela = pontosPDF.map((ponto) => [
       ponto.id,
       ponto.user?.name,
       new Date(ponto.timestamp).toLocaleString(),
-      new Date(ponto.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      new Date(ponto.timestamp).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
       ponto.type.replace("_", " "),
     ]);
 
@@ -219,6 +227,12 @@ function Home() {
       startY: 40,
       styles: { fontSize: 10 },
       headStyles: { fillColor: [22, 163, 74] },
+      didDrawPage: (data) => {
+        const pageSize = doc.internal.pageSize;
+        const pageHeight = pageSize.getHeight();
+        doc.setFontSize(9);
+        doc.text("Desenvolvido por Paulo Henrique", 14, pageHeight - 10);
+      },
     });
 
     doc.save(`folha-de-ponto.pdf`);
@@ -302,13 +316,23 @@ function Home() {
             </h3>
 
             <div className="w-full sm:w-auto">
-              <input
-                type="text"
-                placeholder="Buscar por nome ou tipo"
-                className=" mb-4 w-full sm:w-64 p-2 border border-gray-300 dark:border-slate-600 rounded-lg dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-              />
+              <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
+                <input
+                  type="text"
+                  placeholder="Buscar por nome ou tipo"
+                  className="mb-4 w-full sm:w-64 p-2 border border-gray-300 dark:border-slate-600 rounded-lg dark:bg-slate-700 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                />
+
+                <button
+                  onClick={handleExportPDF}
+                  className="mb-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm flex items-center justify-center gap-2"
+                  title="Baixar PDF"
+                >
+                  📄 <span className="hidden sm:inline">PDF</span>
+                </button>
+              </div>
 
               {pontosFiltrados.length === 0 ? (
                 <div className="text-center py-10 opacity-70">

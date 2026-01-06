@@ -66,8 +66,10 @@ app.post("/pontos", async (req, res) => {
 
 app.get("/pontos", async (req, res) => {
   try {
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+
     const pontos = await prisma.ponto.findMany({
-      take: 10,
+      take: limit,
       orderBy: { timestamp: "desc" },
       include: { user: true },
     });

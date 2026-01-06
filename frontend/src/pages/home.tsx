@@ -196,6 +196,35 @@ function Home() {
       ponto.type.toLowerCase().includes(busca.toLowerCase())
   );
 
+  const handleExportPDF = () => {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text("Relatório de Ponto Eletrônico", 14, 22);
+
+    doc.setFontSize(10);
+    doc.text(`Relatório gerado em ${new Date().toLocaleDateString()} ás ${new Date().toLocaleTimeString()}`, 14, 30);
+    doc.text("Desenvolvido por Paulo Henrique", 14, 35);
+
+    const dadosDaTabela = pontosFiltrados.map((ponto ) => [
+      ponto.id,
+      ponto.user?.name,
+      new Date(ponto.timestamp).toLocaleString(),
+      new Date(ponto.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      ponto.type.replace("_", " "),
+    ]);
+
+    autoTable(doc, {
+      head: [[`ID`, `Funcionário`, `Data`, `Hora`, `Tipo`]],
+      body: dadosDaTabela,
+      startY: 40,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [22, 163, 74] },
+    });
+
+    doc.save(`folha-de-ponto.pdf`);
+    toast.success("PDF baixado com sucesso!");
+  };
+
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gray-100 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 font-sans">

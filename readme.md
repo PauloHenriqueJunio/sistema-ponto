@@ -47,13 +47,9 @@ cd sistema-ponto
 docker compose up -d
 ```
 
-3. Execute as migrations do banco:
+> **As migrations do banco são aplicadas automaticamente na inicialização!**
 
-```bash
-docker compose exec backend npx prisma migrate dev
-```
-
-4. Acesse a aplicação:
+3. Acesse a aplicação:
    - **Frontend:** http://localhost:5173
    - **Backend:** http://localhost:3000
    - **Banco de Dados:** localhost:5432
@@ -83,6 +79,12 @@ docker compose restart backend
 
 ```bash
 docker compose exec db psql -U admin -d pontodb
+```
+
+**Criar nova migration (apenas se necessário):**
+
+```bash
+docker compose exec backend npx prisma migrate dev --name nome_da_migration
 ```
 
 ### API - Rotas Disponíveis

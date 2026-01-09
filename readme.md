@@ -213,9 +213,11 @@ npm run dev
 
 Este projeto está sob a licença MIT.
 
-## Autor
+### Autor
 
 Feito por **Paulo Henrique**
+
+##
 
 [![Linkedin Badge](https://img.shields.io/badge/-Paulo_Henrique-blue?style=flat-square&logo=Linkedin&logoColor=white&link=LINK_DO_SEU_LINKEDIN)](https://www.linkedin.com/in/paulo-henrique-junio/)
 [![Gmail Badge](https://img.shields.io/badge/-paulohenriquejunio@hotmail.com-c14438?style=flat-square&logo=Gmail&logoColor=white&link=mailto:paulohenriquejunio@hotmail.com)](mailto:paulohenriquejunio@hotmail.com)

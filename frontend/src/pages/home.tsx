@@ -20,6 +20,11 @@ function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [pontos, setPontos] = useState<Ponto[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(true);
+  const [carregandoMais, setCarregandoMais] = useState(false);
+  
+
 
   const [showModal, setShowModal] = useState(false);
   const [newUserName, setNewUserName] = useState("");

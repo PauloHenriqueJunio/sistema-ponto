@@ -23,8 +23,6 @@ function Home() {
   const [pagina, setPagina] = useState(1);
   const [totalPaginas, setTotalPaginas] = useState(true);
   const [carregandoMais, setCarregandoMais] = useState(false);
-  
-
 
   const [showModal, setShowModal] = useState(false);
   const [newUserName, setNewUserName] = useState("");
@@ -38,16 +36,39 @@ function Home() {
       .then((data) => setUsers(data));
   };
 
-  const fetchPontos = () => {
-    fetch("http://localhost:3000/pontos")
-      .then((res) => res.json())
-      .then((data) => setPontos(data));
+  const fetchPontos = async (paginaParaBuscar = 1, resetar = false) => {
+    try {
+      if (paginaParaBuscar > 1) setCarregandoMais(true);
+
+      const response = await fetch(
+        `http://localhost:3000/pontos?page=${paginaParaBuscar}&limit=9`
+      );
+      const resultado = await response.json();
+
+      if (resetar) {
+        setPontos(resultado.data);
+      } else {
+        setPontos((prev) => [...prev, ...resultado.data]);
+      }
+
+      setTotalPaginas(paginaParaBuscar < resultado.totalPaginas);
+      setCarregandoMais(false);
+    } catch (error) {
+      console.error("Erro ao buscar registros de ponto:", error);
+      setCarregandoMais(false);
+    }
   };
 
   useEffect(() => {
     fetchUsers();
-    fetchPontos();
+    fetchPontos(1, true);
   }, []);
+
+  const handleCarregarMais = () => {
+    const proximaPagina = pagina + 1;
+    setPagina(proximaPagina);
+    fetchPontos(proximaPagina, false);
+  };
 
   const handleBaterPonto = async (tipo: string) => {
     if (!selectedUserId) {

@@ -65,17 +65,43 @@ app.post("/pontos", async (req, res) => {
 });
 
 app.get("/pontos", async (req, res) => {
-  try {
-    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 100);
+  const MAX_LIMIT = 100;
+  const DEFAULT_LIMIT = 10;
+  const DEFAULT_PAGE = 1;
 
+  let page = parseInt(String(req.query.page || ''), 10);
+  if (isNaN(page) || page < 1) {
+    page = DEFAULT_PAGE;
+  }
+
+  let limit = parseInt(String(req.query.limit || ''), 10);
+  if (isNaN(limit) || limit < 1) {
+    limit = DEFAULT_LIMIT;
+  }
+  if (limit > MAX_LIMIT) {
+    limit = MAX_LIMIT;
+  }
+
+  const skip = (page - 1) * limit;
+
+  try {
     const pontos = await prisma.ponto.findMany({
-      take: limit,
-      orderBy: { timestamp: "desc" },
       include: { user: true },
+      orderBy: { timestamp: "desc" },
+      take: limit,
+      skip: skip,
     });
-    res.json(pontos);
+
+    const total = await prisma.ponto.count();
+
+    res.json({
+      data: pontos,
+      total,
+      paginaAtual: page,
+      totalPaginas: Math.ceil(total / limit),
+    });
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar históricos" });
+    res.status(500).json({ error: "Erro ao buscar pontos. Verifique sua conexão ou tente novamente." });
   }
 });
 

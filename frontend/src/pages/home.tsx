@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import jsPDF from "jspdf";
@@ -27,22 +27,22 @@ function Home() {
   const [darkMode] = useState(false);
   const [busca, setBusca] = useState("");
 
-  const fetchUsers = () => {
+  const fetchUsers = useCallback(() => {
     fetch("http://localhost:3000/users")
       .then((res) => res.json())
       .then((data) => setUsers(data));
-  };
+  }, []);
 
-  const fetchPontos = () => {
+  const fetchPontos = useCallback(() => {
     fetch("http://localhost:3000/pontos")
       .then((res) => res.json())
       .then((data) => setPontos(data));
-  };
+  }, []);
 
   useEffect(() => {
     fetchUsers();
     fetchPontos();
-  }, []);
+  }, [fetchUsers, fetchPontos]);
 
   const handleBaterPonto = async (tipo: string) => {
     if (!selectedUserId) {
@@ -210,7 +210,7 @@ function Home() {
       30
     );
 
-    const dadosDaTabela = pontosPDF.map((ponto) => [
+    const dadosDaTabela = pontosPDF.map((ponto: Ponto) => [
       ponto.id,
       ponto.user?.name,
       new Date(ponto.timestamp).toLocaleString(),
@@ -227,7 +227,7 @@ function Home() {
       startY: 40,
       styles: { fontSize: 10 },
       headStyles: { fillColor: [22, 163, 74] },
-      didDrawPage: (data) => {
+      didDrawPage: () => {
         const pageSize = doc.internal.pageSize;
         const pageHeight = pageSize.getHeight();
         doc.setFontSize(9);

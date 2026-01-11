@@ -215,7 +215,7 @@ function Home() {
       30
     );
 
-    const dadosDaTabela = pontosPDF.map((ponto) => [
+    const dadosDaTabela = pontosPDF.map((ponto: Ponto) => [
       ponto.id,
       ponto.user?.name,
       new Date(ponto.timestamp).toLocaleString(),
@@ -232,7 +232,7 @@ function Home() {
       startY: 40,
       styles: { fontSize: 10 },
       headStyles: { fillColor: [22, 163, 74] },
-      didDrawPage: (data) => {
+      didDrawPage: () => {
         const pageSize = doc.internal.pageSize;
         const pageHeight = pageSize.getHeight();
         doc.setFontSize(9);

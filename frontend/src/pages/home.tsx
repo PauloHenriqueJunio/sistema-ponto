@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import jsPDF from "jspdf";
@@ -29,6 +29,7 @@ function Home() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [darkMode] = useState(false);
   const [busca, setBusca] = useState("");
+  const [primeiroCarregamento, setPrimeiroCarregamento] = useState(true);
 
   const fetchUsers = () => {
     fetch("http://localhost:3000/users")
@@ -36,33 +37,40 @@ function Home() {
       .then((data) => setUsers(data));
   };
 
-  const fetchPontos = async (paginaParaBuscar = 1, resetar = false) => {
-    try {
-      if (paginaParaBuscar > 1) setCarregandoMais(true);
+  const fetchPontos = useCallback(
+    async (paginaParaBuscar = 1, resetar = false) => {
+      try {
+        if (paginaParaBuscar > 1) setCarregandoMais(true);
 
-      const response = await fetch(
-        `http://localhost:3000/pontos?page=${paginaParaBuscar}&limit=9`
-      );
-      const resultado = await response.json();
+        const response = await fetch(
+          `http://localhost:3000/pontos?page=${paginaParaBuscar}&limit=9`
+        );
+        const resultado = await response.json();
 
-      if (resetar) {
-        setPontos(resultado.data);
-      } else {
-        setPontos((prev) => [...prev, ...resultado.data]);
+        if (resetar) {
+          setPontos(resultado.data);
+        } else {
+          setPontos((prev) => [...prev, ...resultado.data]);
+        }
+
+        setTotalPaginas(paginaParaBuscar < resultado.totalPaginas);
+        setCarregandoMais(false);
+      } catch (error) {
+        console.error("Erro ao buscar registros de ponto:", error);
+        setCarregandoMais(false);
       }
-
-      setTotalPaginas(paginaParaBuscar < resultado.totalPaginas);
-      setCarregandoMais(false);
-    } catch (error) {
-      console.error("Erro ao buscar registros de ponto:", error);
-      setCarregandoMais(false);
-    }
-  };
+    },
+    []
+  );
 
   useEffect(() => {
-    fetchUsers();
-    fetchPontos(1, true);
-  }, []);
+    if (primeiroCarregamento) {
+      fetchUsers();
+      fetchPontos(1, true);
+      setPrimeiroCarregamento(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primeiroCarregamento]);
 
   const handleCarregarMais = () => {
     const proximaPagina = pagina + 1;

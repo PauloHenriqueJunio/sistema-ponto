@@ -236,7 +236,7 @@ function Home() {
       30
     );
 
-    const dadosDaTabela = pontosPDF.map((ponto) => [
+    const dadosDaTabela = pontosPDF.map((ponto: Ponto) => [
       ponto.id,
       ponto.user?.name,
       new Date(ponto.timestamp).toLocaleString(),
@@ -253,7 +253,7 @@ function Home() {
       startY: 40,
       styles: { fontSize: 10 },
       headStyles: { fillColor: [22, 163, 74] },
-      didDrawPage: (data) => {
+      didDrawPage: () => {
         const pageSize = doc.internal.pageSize;
         const pageHeight = pageSize.getHeight();
         doc.setFontSize(9);
@@ -428,6 +428,28 @@ function Home() {
                       </div>
                     </div>
                   ))}
+                  {totalPaginas && !busca && (
+                    <div className="mt-6 flex justify-center">
+                      <button
+                        onClick={handleCarregarMais}
+                        disabled={carregandoMais}
+                        className="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {carregandoMais ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white">
+                            Carregando...
+                          </div>
+                        ) : (
+                          "Carregar mais registros"
+                        )}
+                      </button>
+                    </div>
+                  )}
+                  {!totalPaginas && pontos.length > 0 && !busca && (
+                    <p className="text-center text-gray-400 mt-6 text-sm italic">
+                      Todos os registros já foram carregados.
+                    </p>
+                  )}
                 </div>
               )}
             </div>

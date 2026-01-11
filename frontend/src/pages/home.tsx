@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import jsPDF from "jspdf";
@@ -26,6 +26,7 @@ function Home() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [darkMode] = useState(false);
   const [busca, setBusca] = useState("");
+  const [primeiroCarregamento, setPrimeiroCarregamento] = useState(true);
 
   const fetchUsers = () => {
     fetch("http://localhost:3000/users")
@@ -33,16 +34,20 @@ function Home() {
       .then((data) => setUsers(data));
   };
 
-  const fetchPontos = () => {
+  const fetchPontos = useCallback(() => {
     fetch("http://localhost:3000/pontos")
       .then((res) => res.json())
       .then((data) => setPontos(data));
-  };
+  }, []);
 
   useEffect(() => {
-    fetchUsers();
-    fetchPontos();
-  }, []);
+    if (primeiroCarregamento) {
+      fetchUsers();
+      fetchPontos();
+      setPrimeiroCarregamento(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [primeiroCarregamento]);
 
   const handleBaterPonto = async (tipo: string) => {
     if (!selectedUserId) {

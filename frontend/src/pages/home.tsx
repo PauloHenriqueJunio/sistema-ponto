@@ -99,7 +99,8 @@ function Home() {
       }),
     }).then((response) => {
       if (!response.ok) throw new Error("Erro ao registrar ponto");
-      fetchPontos();
+      setPagina(1);
+      fetchPontos(1, true);
       return response;
     });
 
@@ -158,7 +159,8 @@ function Home() {
         method: "DELETE",
       }).then((res) => {
         if (!res.ok) throw new Error("Erro ao excluir registro");
-        fetchPontos();
+        setPagina(1);
+        fetchPontos(1, true);
         return res;
       });
 
@@ -209,7 +211,8 @@ function Home() {
             "O tipo do registro foi corrigido.",
             "success"
           );
-          fetchPontos();
+          setPagina(1);
+          fetchPontos(1, true);
         } else {
           toast.error("Erro ao atualizar");
         }

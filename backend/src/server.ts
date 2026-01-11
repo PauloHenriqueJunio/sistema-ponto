@@ -70,13 +70,13 @@ app.get("/pontos", async (req, res) => {
   const DEFAULT_PAGE = 1;
 
   // Parse and validate page parameter
-  let page = parseInt(req.query.page as string, 10);
+  let page = parseInt(String(req.query.page || ''), 10);
   if (isNaN(page) || page < 1) {
     page = DEFAULT_PAGE;
   }
 
   // Parse and validate limit parameter
-  let limit = parseInt(req.query.limit as string, 10);
+  let limit = parseInt(String(req.query.limit || ''), 10);
   if (isNaN(limit) || limit < 1) {
     limit = DEFAULT_LIMIT;
   }

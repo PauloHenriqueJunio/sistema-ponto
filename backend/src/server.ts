@@ -86,7 +86,7 @@ app.get("/pontos", async (req, res) => {
       totalPaginas: Math.ceil(total / limit),
     });
   } catch (error) {
-    res.status(500).json({ error: "Erro ao buscar pontos" });
+    res.status(500).json({ error: "Erro ao buscar pontos. Verifique sua conexão ou tente novamente." });
   }
 });
 

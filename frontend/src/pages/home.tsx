@@ -65,7 +65,8 @@ function Home() {
   useEffect(() => {
     fetchUsers();
     fetchPontos();
-  }, [fetchUsers, fetchPontos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCarregarMais = () => {
     const proximaPagina = pagina + 1;

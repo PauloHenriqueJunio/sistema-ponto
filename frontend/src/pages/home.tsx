@@ -44,6 +44,17 @@ function Home() {
         const response = await fetch(
           `http://localhost:3000/pontos?page=${paginaParaBuscar}&limit=9`
         );
+        if (!response.ok) {
+          let errorMessage = `Erro HTTP ao buscar registros de ponto: ${response.status} ${response.statusText}`;
+          try {
+            const errorText = await response.text();
+            if (errorText) {
+              errorMessage += ` - ${errorText}`;
+            }
+          } catch {
+          }
+          throw new Error(errorMessage);
+        }
         const resultado = await response.json();
 
         if (resetar) {

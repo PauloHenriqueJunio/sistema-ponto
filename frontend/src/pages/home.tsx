@@ -20,6 +20,9 @@ function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [pontos, setPontos] = useState<Ponto[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(true);
+  const [carregandoMais, setCarregandoMais] = useState(false);
 
   const [showModal, setShowModal] = useState(false);
   const [newUserName, setNewUserName] = useState("");
@@ -33,16 +36,43 @@ function Home() {
       .then((data) => setUsers(data));
   }, []);
 
-  const fetchPontos = useCallback(() => {
-    fetch("http://localhost:3000/pontos")
-      .then((res) => res.json())
-      .then((data) => setPontos(data));
-  }, []);
+  const fetchPontos = useCallback(
+    async (paginaParaBuscar = 1, resetar = false) => {
+      try {
+        if (paginaParaBuscar > 1) setCarregandoMais(true);
+
+        const response = await fetch(
+          `http://localhost:3000/pontos?page=${paginaParaBuscar}&limit=9`
+        );
+        const resultado = await response.json();
+
+        if (resetar) {
+          setPontos(resultado.data);
+        } else {
+          setPontos((prev) => [...prev, ...resultado.data]);
+        }
+
+        setTotalPaginas(paginaParaBuscar < resultado.totalPaginas);
+        setCarregandoMais(false);
+      } catch (error) {
+        console.error("Erro ao buscar registros de ponto:", error);
+        setCarregandoMais(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     fetchUsers();
     fetchPontos();
-  }, [fetchUsers, fetchPontos]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleCarregarMais = () => {
+    const proximaPagina = pagina + 1;
+    setPagina(proximaPagina);
+    fetchPontos(proximaPagina, false);
+  };
 
   const handleBaterPonto = async (tipo: string) => {
     if (!selectedUserId) {
@@ -402,6 +432,29 @@ function Home() {
                       </div>
                     </div>
                   ))}
+                  {totalPaginas && !busca && (
+                    <div className="mt-6 flex justify-center">
+                      <button
+                        onClick={handleCarregarMais}
+                        disabled={carregandoMais}
+                        className="bg-blue-600 hover:bg-blue-700 dark:hover:bg-blue-800 text-white font-bold py-2 px-6 rounded-full shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      >
+                        {carregandoMais ? (
+                          <>
+                            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white" />
+                            <span>Carregando...</span>
+                          </>
+                        ) : (
+                          "Carregar mais registros"
+                        )}
+                      </button>
+                    </div>
+                  )}
+                  {!totalPaginas && pontos.length > 0 && !busca && (
+                    <p className="text-center text-gray-400 mt-6 text-sm italic">
+                      Todos os registros já foram carregados.
+                    </p>
+                  )}
                 </div>
               )}
             </div>

@@ -12,4 +12,4 @@ COPY . .
 RUN npx prisma generate
 
 EXPOSE 3000
-CMD ["npx", "nodemon", "src/server.ts"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx nodemon src/server.ts"]

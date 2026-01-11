@@ -29,13 +29,12 @@ function Home() {
   const [newUserEmail, setNewUserEmail] = useState("");
   const [darkMode] = useState(false);
   const [busca, setBusca] = useState("");
-  const [primeiroCarregamento, setPrimeiroCarregamento] = useState(true);
 
-  const fetchUsers = () => {
+  const fetchUsers = useCallback(() => {
     fetch("http://localhost:3000/users")
       .then((res) => res.json())
       .then((data) => setUsers(data));
-  };
+  }, []);
 
   const fetchPontos = useCallback(
     async (paginaParaBuscar = 1, resetar = false) => {
@@ -64,13 +63,9 @@ function Home() {
   );
 
   useEffect(() => {
-    if (primeiroCarregamento) {
-      fetchUsers();
-      fetchPontos(1, true);
-      setPrimeiroCarregamento(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [primeiroCarregamento]);
+    fetchUsers();
+    fetchPontos();
+  }, [fetchUsers, fetchPontos]);
 
   const handleCarregarMais = () => {
     const proximaPagina = pagina + 1;

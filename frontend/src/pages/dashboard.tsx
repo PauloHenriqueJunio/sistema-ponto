@@ -117,6 +117,7 @@ function Dashboard() {
                 />
                 <YAxis stroke="#888888" fontSize={12} tickLine={false} />
                 <Tooltip
+                  separator=": "
                   contentStyle={{
                     backgroundColor: bgColor,
                     border: "none",
@@ -159,6 +160,7 @@ function Dashboard() {
                   ))}
                 </Pie>
                 <Tooltip
+                  separator=": "
                   contentStyle={{
                     backgroundColor: bgColor,
                     border: "none",

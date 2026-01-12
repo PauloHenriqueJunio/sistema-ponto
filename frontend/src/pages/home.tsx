@@ -51,7 +51,8 @@ function Home() {
             if (errorText) {
               errorMessage += ` - ${errorText}`;
             }
-          } catch {
+          } catch (err) {
+            console.error("Erro ao ler texto de resposta:", err);
           }
           throw new Error(errorMessage);
         }

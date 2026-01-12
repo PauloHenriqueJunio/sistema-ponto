@@ -1,8 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { gerarPDF, gerarCSV } from "../utils/reports";
 
 interface User {
   id: number;
@@ -242,75 +241,12 @@ function Home() {
 
   const handleExportPDF = async () => {
     const response = await fetch("http://localhost:3000/pontos?limit=100");
-    const pontosPDF = await response.json();
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Relatório de Ponto Eletrônico", 14, 22);
-
-    doc.setFontSize(10);
-    doc.text(
-      `Relatório gerado em ${new Date().toLocaleDateString()} ás ${new Date().toLocaleTimeString()}`,
-      14,
-      30
-    );
-
-    const dadosDaTabela = pontosPDF.map((ponto: Ponto) => [
-      ponto.id,
-      ponto.user?.name,
-      new Date(ponto.timestamp).toLocaleString(),
-      new Date(ponto.timestamp).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      ponto.type.replace("_", " "),
-    ]);
-
-    autoTable(doc, {
-      head: [[`ID`, `Funcionário`, `Data`, `Hora`, `Tipo`]],
-      body: dadosDaTabela,
-      startY: 40,
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [22, 163, 74] },
-      didDrawPage: () => {
-        const pageSize = doc.internal.pageSize;
-        const pageHeight = pageSize.getHeight();
-        doc.setFontSize(9);
-        doc.text("Desenvolvido por Paulo Henrique", 14, pageHeight - 10);
-      },
-    });
-
-    doc.save(`folha-de-ponto.pdf`);
-    toast.success("PDF baixado com sucesso!");
+    const resultado = await response.json();
+    await gerarPDF(resultado.data);
   };
 
   const handleExportCSV = () => {
-    const headers = ["ID", "Funcionário", "Data", "Hora", "Tipo"];
-    const csvRows = pontos.map((ponto) => {
-      const data = new Date(ponto.timestamp);
-      const dataFormatada = data.toLocaleDateString("pt-BR");
-      const horaFormatada = data.toLocaleTimeString("pt-BR");
-      const linha = [
-        ponto.id,
-        ponto.user.name,
-        dataFormatada,
-        horaFormatada,
-        ponto.type.replace("_", " "),
-      ];
-      return linha.join(",");
-    });
-
-    const csvContent = [headers.join(","), ...csvRows].join("\n");
-    const blob = new Blob(["\uFEFF" + csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "relatorio-ponto.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("CSV baixado com sucesso!");
+    gerarCSV(pontos);
   };
 
   return (

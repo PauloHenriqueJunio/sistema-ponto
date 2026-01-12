@@ -3,13 +3,7 @@ import autoTable from "jspdf-autotable";
 import toast from "react-hot-toast";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-
-interface Ponto {
-  id: number;
-  type: string;
-  timestamp: string;
-  user: { name: string };
-}
+import type { Ponto } from "../types.ts";
 
 export const gerarExcel = async (pontos: Ponto[]) => {
   try {
@@ -96,8 +90,8 @@ export const gerarPDF = async (pontos: Ponto[]): Promise<void> => {
     const dadosDaTabela = pontos.map((ponto: Ponto) => [
       ponto.id,
       ponto.user?.name,
-      new Date(ponto.timestamp).toLocaleString(),
-      new Date(ponto.timestamp).toLocaleTimeString([], {
+      new Date(ponto.timestamp).toLocaleDateString("pt-BR"),
+      new Date(ponto.timestamp).toLocaleTimeString("pt-BR", {
         hour: "2-digit",
         minute: "2-digit",
       }),
@@ -140,12 +134,12 @@ export const gerarCSV = (pontos: Ponto[]): void => {
       const horaFormatada = data.toLocaleTimeString("pt-BR");
       const linha = [
         ponto.id,
-        ponto.user.name,
+        ponto.user?.name ?? "",
         dataFormatada,
         horaFormatada,
         ponto.type.replace("_", " "),
       ];
-      return linha.join(",");
+      return linha.map((item) => `"${item}"`).join(",");
     });
 
     const csvContent = [headers.join(","), ...csvRows].join("\n");

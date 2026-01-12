@@ -1,19 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import Swal from "sweetalert2";
 import { gerarPDF, gerarExcel } from "../utils/reports";
-
-interface User {
-  id: number;
-  name: string;
-}
-
-interface Ponto {
-  id: number;
-  type: string;
-  timestamp: string;
-  user: { name: string };
-}
+import type { User, Ponto } from "../types.ts";
 
 function Home() {
   const [users, setUsers] = useState<User[]>([]);
@@ -239,10 +228,8 @@ function Home() {
       ponto.type.toLowerCase().includes(busca.toLowerCase())
   );
 
-  const handleExportPDF = async () => {
-    const response = await fetch("http://localhost:3000/pontos?limit=100");
-    const resultado = await response.json();
-    await gerarPDF(resultado.data);
+  const handleExportPDF = () => {
+    gerarPDF(pontos);
   };
 
   const handleExportExcel = () => {
@@ -252,7 +239,6 @@ function Home() {
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gray-100 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 font-sans">
-        <Toaster position="top-right" reverseOrder={true} />
         <div className="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
           <div className="bg-slate-800 p-6 text-white text-center justify-between items-center relative">
             <h1 className="text-3xl font-bold">Ponto Eletrônico</h1>

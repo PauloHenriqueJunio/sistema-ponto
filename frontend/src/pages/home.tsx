@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import { gerarPDF, gerarExcel } from "../utils/reports";
 import type { User, Ponto } from "../types.ts";
@@ -238,6 +238,7 @@ function Home() {
 
   return (
     <div className={darkMode ? "dark" : ""}>
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="min-h-screen bg-gray-100 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 font-sans">
         <div className="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
           <div className="bg-slate-800 p-6 text-white text-center justify-between items-center relative">

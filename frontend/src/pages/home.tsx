@@ -283,6 +283,21 @@ function Home() {
     toast.success("PDF baixado com sucesso!");
   };
 
+  const handleExportCSV = () => {
+    const headers = ["ID", "Funcionário", "Data", "Hora", "Tipo"];
+    const csvRows = pontos.map((ponto) => {
+      const linha = [
+        ponto.id,
+        ponto.data,
+        ponto.entrada1 || "",
+        ponto.saida1 || "",
+        ponto.entrada2 || "",
+        ponto.saida2 || "",
+      ];
+      return linha.join(",");
+    });
+  };
+
   return (
     <div className={darkMode ? "dark" : ""}>
       <div className="min-h-screen bg-gray-100 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 font-sans">

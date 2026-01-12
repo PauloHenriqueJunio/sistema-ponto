@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
-import { gerarPDF, gerarCSV } from "../utils/reports";
+import { gerarPDF, gerarExcel } from "../utils/reports";
 
 interface User {
   id: number;
@@ -75,7 +75,7 @@ function Home() {
 
   useEffect(() => {
     fetchUsers();
-    fetchPontos();
+    fetchPontos(1, true);
   }, [fetchUsers, fetchPontos]);
 
   const handleCarregarMais = () => {
@@ -245,8 +245,8 @@ function Home() {
     await gerarPDF(resultado.data);
   };
 
-  const handleExportCSV = () => {
-    gerarCSV(pontos);
+  const handleExportExcel = () => {
+    gerarExcel(pontos);
   };
 
   return (
@@ -275,7 +275,7 @@ function Home() {
                 value={selectedUserId}
                 onChange={(e) => setSelectedUserId(e.target.value)}
               >
-                <option value="">-- Selecione seu nome --</option>
+                <option value="">Selecione seu nome</option>
                 {users.map((user) => (
                   <option key={user.id} value={user.id}>
                     {user.name}
@@ -344,11 +344,11 @@ function Home() {
                 </button>
 
                 <button
-                  onClick={handleExportCSV}
+                  onClick={handleExportExcel}
                   className="mb-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm flex items-center justify-center gap-2"
-                  title="Baixar CSV"
+                  title="Baixar Excel"
                 >
-                  📊 <span className="hidden sm:inline">CSV</span>
+                  📊 <span className="hidden sm:inline">Excel</span>
                 </button>
               </div>
 

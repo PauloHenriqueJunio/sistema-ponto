@@ -1,20 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-
-interface User {
-  id: number;
-  name: string;
-}
-
-interface Ponto {
-  id: number;
-  type: string;
-  timestamp: string;
-  user: { name: string };
-}
+import { gerarPDF, gerarExcel } from "../utils/reports";
+import type { User, Ponto } from "../types.ts";
 
 function Home() {
   const [users, setUsers] = useState<User[]>([]);
@@ -76,7 +64,7 @@ function Home() {
 
   useEffect(() => {
     fetchUsers();
-    fetchPontos();
+    fetchPontos(1, true);
   }, [fetchUsers, fetchPontos]);
 
   const handleCarregarMais = () => {
@@ -240,53 +228,18 @@ function Home() {
       ponto.type.toLowerCase().includes(busca.toLowerCase())
   );
 
-  const handleExportPDF = async () => {
-    const response = await fetch("http://localhost:3000/pontos?limit=100");
-    const pontosPDF = await response.json();
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Relatório de Ponto Eletrônico", 14, 22);
+  const handleExportPDF = () => {
+    gerarPDF(pontos);
+  };
 
-    doc.setFontSize(10);
-    doc.text(
-      `Relatório gerado em ${new Date().toLocaleDateString()} ás ${new Date().toLocaleTimeString()}`,
-      14,
-      30
-    );
-
-    const dadosDaTabela = pontosPDF.map((ponto: Ponto) => [
-      ponto.id,
-      ponto.user?.name,
-      new Date(ponto.timestamp).toLocaleString(),
-      new Date(ponto.timestamp).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-      ponto.type.replace("_", " "),
-    ]);
-
-    autoTable(doc, {
-      head: [[`ID`, `Funcionário`, `Data`, `Hora`, `Tipo`]],
-      body: dadosDaTabela,
-      startY: 40,
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [22, 163, 74] },
-      didDrawPage: () => {
-        const pageSize = doc.internal.pageSize;
-        const pageHeight = pageSize.getHeight();
-        doc.setFontSize(9);
-        doc.text("Desenvolvido por Paulo Henrique", 14, pageHeight - 10);
-      },
-    });
-
-    doc.save(`folha-de-ponto.pdf`);
-    toast.success("PDF baixado com sucesso!");
+  const handleExportExcel = () => {
+    gerarExcel(pontos);
   };
 
   return (
     <div className={darkMode ? "dark" : ""}>
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="min-h-screen bg-gray-100 dark:bg-slate-900 transition-colors duration-300 py-10 px-4 font-sans">
-        <Toaster position="top-right" reverseOrder={true} />
         <div className="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-lg overflow-hidden">
           <div className="bg-slate-800 p-6 text-white text-center justify-between items-center relative">
             <h1 className="text-3xl font-bold">Ponto Eletrônico</h1>
@@ -309,7 +262,7 @@ function Home() {
                 value={selectedUserId}
                 onChange={(e) => setSelectedUserId(e.target.value)}
               >
-                <option value="">-- Selecione seu nome --</option>
+                <option value="">Selecione seu nome</option>
                 {users.map((user) => (
                   <option key={user.id} value={user.id}>
                     {user.name}
@@ -375,6 +328,14 @@ function Home() {
                   title="Baixar PDF"
                 >
                   📄 <span className="hidden sm:inline">PDF</span>
+                </button>
+
+                <button
+                  onClick={handleExportExcel}
+                  className="mb-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm flex items-center justify-center gap-2"
+                  title="Baixar Excel"
+                >
+                  📊 <span className="hidden sm:inline">Excel</span>
                 </button>
               </div>
 
@@ -532,7 +493,6 @@ function Home() {
               </div>
             </div>
           )}
-          <Toaster position="top-right" reverseOrder={false} />
         </div>
       </div>
 

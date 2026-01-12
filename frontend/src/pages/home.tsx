@@ -286,16 +286,31 @@ function Home() {
   const handleExportCSV = () => {
     const headers = ["ID", "Funcionário", "Data", "Hora", "Tipo"];
     const csvRows = pontos.map((ponto) => {
+      const data = new Date(ponto.timestamp);
+      const dataFormatada = data.toLocaleDateString("pt-BR");
+      const horaFormatada = data.toLocaleTimeString("pt-BR");
       const linha = [
         ponto.id,
-        ponto.data,
-        ponto.entrada1 || "",
-        ponto.saida1 || "",
-        ponto.entrada2 || "",
-        ponto.saida2 || "",
+        ponto.user.name,
+        dataFormatada,
+        horaFormatada,
+        ponto.type.replace("_", " "),
       ];
       return linha.join(",");
     });
+
+    const csvContent = [headers.join(","), ...csvRows].join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "relatorio-ponto.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("CSV baixado com sucesso!");
   };
 
   return (
@@ -390,6 +405,14 @@ function Home() {
                   title="Baixar PDF"
                 >
                   📄 <span className="hidden sm:inline">PDF</span>
+                </button>
+
+                <button
+                  onClick={handleExportCSV}
+                  className="mb-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold transition shadow-sm flex items-center justify-center gap-2"
+                  title="Baixar CSV"
+                >
+                  📊 <span className="hidden sm:inline">CSV</span>
                 </button>
               </div>
 
@@ -547,7 +570,6 @@ function Home() {
               </div>
             </div>
           )}
-          <Toaster position="top-right" reverseOrder={false} />
         </div>
       </div>
 

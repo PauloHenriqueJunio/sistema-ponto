@@ -9,15 +9,25 @@
 
 > Um sistema completo para gestão de jornada de trabalho, rodando 100% containerizado.
 
+## Demonstração
+
+![Sistema em funcionamento](./assets/demo.gif)
+![Dashboard](./assets/dashboardDemo.gif)
+
 ### Funcionalidades
 
-- Registro de ponto eletrônico (Entrada, Saída Almoço, Volta Almoço, Saída)
-- Cadastro de funcionários
-- Listagem de registros de ponto em tempo real
-- Interface responsiva e moderna com Tailwind CSS
-- Notificações toast para feedback de ações
-- Validação de formulários
-- Sistema totalmente containerizado com Docker
+- ✅ Registro de ponto eletrônico (Entrada, Saída Almoço, Volta Almoço, Saída)
+- ✅ Cadastro de funcionários
+- ✅ Listagem de registros de ponto em tempo real
+- ✅ **Exportação de relatórios em PDF e Excel**
+- ✅ Dashboard gerencial com gráficos e estatísticas
+- ✅ Edição e exclusão de registros de ponto
+- ✅ Sistema de busca e filtros
+- ✅ Paginação automática
+- ✅ Interface responsiva e moderna com Tailwind CSS
+- ✅ Notificações toast para feedback de ações
+- ✅ Validação de formulários
+- ✅ Sistema totalmente containerizado com Docker
 
 ### Tecnologias Utilizadas
 

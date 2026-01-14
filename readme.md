@@ -170,26 +170,6 @@ docker compose exec backend npx prisma migrate dev --name nome_da_migration
 - Tipos válidos: `ENTRADA`, `SAIDA_ALMOCO`, `VOLTA_ALMOCO`, `SAIDA`
 - Resposta: `201 Created`
 
-### Estrutura do Projeto
-
-```
-sistema-ponto/
-├── backend/
-│   ├── src/
-│   │   └── server.ts
-│   ├── prisma/
-│   │   └── schema.prisma
-│   ├── Dockerfile
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   ├── Dockerfile
-│   └── package.json
-└── docker-compose.yml
-```
-
 ### Desenvolvimento Local
 
 Para desenvolvimento sem Docker:

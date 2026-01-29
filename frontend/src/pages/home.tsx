@@ -3,6 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Swal from "sweetalert2";
 import { gerarPDF, gerarExcel } from "../utils/reports";
 import type { User, Ponto } from "../types.ts";
+import { API_URL } from "../config";
 
 function Home() {
   const [users, setUsers] = useState<User[]>([]);
@@ -19,7 +20,7 @@ function Home() {
   const [busca, setBusca] = useState("");
 
   const fetchUsers = useCallback(() => {
-    fetch("http://localhost:3000/users")
+    fetch(`${API_URL}/users`)
       .then((res) => res.json())
       .then((data) => setUsers(data));
   }, []);
@@ -30,7 +31,7 @@ function Home() {
         if (paginaParaBuscar > 1) setCarregandoMais(true);
 
         const response = await fetch(
-          `http://localhost:3000/pontos?page=${paginaParaBuscar}&limit=9`
+          `${API_URL}/pontos?page=${paginaParaBuscar}&limit=9`,
         );
         if (!response.ok) {
           let errorMessage = `Erro HTTP ao buscar registros de ponto: ${response.status} ${response.statusText}`;
@@ -59,7 +60,7 @@ function Home() {
         setCarregandoMais(false);
       }
     },
-    []
+    [],
   );
 
   useEffect(() => {
@@ -79,7 +80,7 @@ function Home() {
       return;
     }
 
-    const promise = fetch("http://localhost:3000/pontos", {
+    const promise = fetch(`${API_URL}/pontos`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -103,7 +104,7 @@ function Home() {
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const promise = fetch("http://localhost:3000/users", {
+    const promise = fetch(`${API_URL}/users`, {
       method: "POST",
       headers: { "Content-type": "application/json" },
       body: JSON.stringify({
@@ -144,7 +145,7 @@ function Home() {
     if (!result.isConfirmed) return;
 
     try {
-      const promise = fetch(`http://localhost:3000/pontos/${id}`, {
+      const promise = fetch(`${API_URL}/pontos/${id}`, {
         method: "DELETE",
       }).then((res) => {
         if (!res.ok) throw new Error("Erro ao excluir registro");
@@ -185,20 +186,17 @@ function Home() {
 
     if (novoTipo) {
       try {
-        const response = await fetch(
-          `http://localhost:3000/pontos/${ponto.id}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ type: novoTipo }),
-          }
-        );
+        const response = await fetch(`${API_URL}/pontos/${ponto.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: novoTipo }),
+        });
 
         if (response.ok) {
           Swal.fire(
             "Atualizado!",
             "O tipo do registro foi corrigido.",
-            "success"
+            "success",
           );
           setPagina(1);
           fetchPontos(1, true);
@@ -225,7 +223,7 @@ function Home() {
   const pontosFiltrados = pontos.filter(
     (ponto) =>
       ponto.user?.name.toLowerCase().includes(busca.toLowerCase()) ||
-      ponto.type.toLowerCase().includes(busca.toLowerCase())
+      ponto.type.toLowerCase().includes(busca.toLowerCase()),
   );
 
   const handleExportPDF = () => {
@@ -381,7 +379,7 @@ function Home() {
                           </span>
                           <span
                             className={`px-2 py-1 rounded-md text-xs font-bold border ${getBadgeColor(
-                              ponto.type
+                              ponto.type,
                             )}`}
                           >
                             {ponto.type.replace("_", " ")}

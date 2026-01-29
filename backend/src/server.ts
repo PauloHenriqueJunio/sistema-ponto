@@ -178,3 +178,12 @@ app.get("/stats", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
+
+
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://sistema-ponto-liart.vercel.app'
+  ],
+  credentials: true
+}));

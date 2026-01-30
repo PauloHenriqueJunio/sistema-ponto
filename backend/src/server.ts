@@ -1,6 +1,10 @@
 import express from "express";
 import cors from "cors";
 import { prisma } from "./lib/prisma";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,7 +33,7 @@ app.post("/users", async (req, res) => {
       data: {
         name,
         email,
-        password,
+        password: await bcrypt.hash(password, 10),
         role: role || "FUNCIONARIO",
       },
     });
@@ -136,6 +140,31 @@ app.put("/pontos/:id", async (req, res) => {
     res.status(500).json({ error: "Erro ao atualizar registro" });
   }
 });
+
+app.post("/login", async (req, res) => {
+  const {email, senha } = req.body;
+  if (!email || !senha) {
+    return res.status(400).json({ error: "Email e a senha são obrigatórios" });
+  }
+
+  const user = await prisma.user.findUnique({ where: {email}});
+  if(!user) {
+    return res.status(401).json({ error: "Usuário ou senha inválidos" });
+  }
+
+  const senhaCorreta = await bcrypt.compare(senha, user.password);
+  if (!senhaCorreta) {
+    return res.status(401).json({ error: "Usuário ou senha inválidos" });
+  }
+
+  const token = jwt.sign(
+    { userId: user.id, email: user.email, role: user.role },
+    process.env.JWT_SECRET!,
+    { expiresIn: "1d" }
+  );
+
+  res.json({ token });
+})
 
 app.get("/stats", async (req, res) => {
   try {

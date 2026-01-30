@@ -27,6 +27,7 @@ services:
     environment:
       DATABASE_URL: postgres://admin:password123@db:5432/pontodb
       PORT: 3000
+      JWT_SECRET: "change_me_dev_secret"
     depends_on:
       db:
         condition: service_healthy

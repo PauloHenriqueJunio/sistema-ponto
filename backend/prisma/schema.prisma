@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
@@ -12,13 +12,29 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
-  password  String
-  role      String   @default("FUNCIONARIO")
+  // `User` agora representa o funcionário (domínio).
+  // Campos de autenticação (email/senha/role) foram movidos para `Account`.
   createdAt DateTime @default(now())
-  
-  pontos    Ponto[]
+
+  pontos  Ponto[]
+  // relação opcional para a conta de autenticação vinculada a este funcionário
+  account Account?
 
   @@map("users")
+}
+
+model Account {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      String   @default("ADMIN")
+  createdAt DateTime @default(now())
+
+  // opcionalmente vincula a uma entidade `User` (funcionário)
+  employeeId Int?  @unique
+  employee   User? @relation(fields: [employeeId], references: [id])
+
+  @@map("accounts")
 }
 
 model Ponto {
@@ -26,8 +42,8 @@ model Ponto {
   userId    Int
   type      String
   timestamp DateTime @default(now())
-  
-  user      User     @relation(fields: [userId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
 
   @@map("pontos")
 }

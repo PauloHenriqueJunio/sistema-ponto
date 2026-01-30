@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { prisma } from "./lib/prisma";
-import jwt from "jsonwebtoken";
+const jwt: any = require("jsonwebtoken");
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 dotenv.config();
@@ -27,14 +27,12 @@ app.get("/users", async (req, res) => {
 
 app.post("/users", async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email } = req.body;
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
-        password: await bcrypt.hash(password, 10),
-        role: role || "FUNCIONARIO",
       },
     });
 
@@ -42,6 +40,30 @@ app.post("/users", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(400).json({ error: "Erro ao criar usuário (Email já existe?)" });
+  }
+});
+
+// Endpoint para criar contas de autenticação (opcionalmente vinculadas a um funcionário)
+app.post("/accounts", async (req, res) => {
+  try {
+    const { email, password, employeeId, role } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email e password são obrigatórios" });
+    }
+
+    const account = await prisma.account.create({
+      data: {
+        email,
+        password: await bcrypt.hash(password, 10),
+        role: role || "ADMIN",
+        employeeId: employeeId ? Number(employeeId) : undefined,
+      },
+    });
+
+    res.status(201).json({ id: account.id, email: account.email, employeeId: account.employeeId });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({ error: "Erro ao criar account (Email já existe?)" });
   }
 });
 
@@ -142,29 +164,30 @@ app.put("/pontos/:id", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const {email, senha } = req.body;
+  const { email, senha } = req.body;
   if (!email || !senha) {
     return res.status(400).json({ error: "Email e a senha são obrigatórios" });
   }
 
-  const user = await prisma.user.findUnique({ where: {email}});
-  if(!user) {
+  // Busca na tabela de accounts (autenticação)
+  const account = await prisma.account.findUnique({ where: { email } });
+  if (!account) {
     return res.status(401).json({ error: "Usuário ou senha inválidos" });
   }
 
-  const senhaCorreta = await bcrypt.compare(senha, user.password);
+  const senhaCorreta = await bcrypt.compare(senha, account.password);
   if (!senhaCorreta) {
     return res.status(401).json({ error: "Usuário ou senha inválidos" });
   }
 
   const token = jwt.sign(
-    { userId: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET!,
+    { accountId: account.id, email: account.email, role: account.role, employeeId: account.employeeId },
+    process.env.JWT_SECRET || "",
     { expiresIn: "1d" }
   );
 
   res.json({ token });
-})
+});
 
 app.get("/stats", async (req, res) => {
   try {
